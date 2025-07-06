@@ -5,5 +5,5 @@ public class Configuration()
     public string Name { get; set; }
     public string Path { get; set; }
     public string Resolution { get; set; } 
-    public int Scale { get; set; }
+    public bool Enabled { get; set; } = true;
 }

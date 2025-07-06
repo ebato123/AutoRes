@@ -11,10 +11,7 @@
 
   <ItemGroup>
     <Content Include="autores_256.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\AutoResShared\AutoResShared.csproj" />
+    <Content Include="Resources\autores_256.ico" />
   </ItemGroup>
 
 </Project>

@@ -52,11 +52,10 @@ namespace AutoRes.Forms
                 Configuration conf = _configurations.Find(c => c.Name.Equals(_program, StringComparison.OrdinalIgnoreCase));
                 if (conf != null)
                 {
-                    if (MessageBox.Show($"Ya existe una configuración para {conf.Name} ({conf.Resolution} / {conf.Scale}).\n\n¿Desea sobreescribir esta configuración?","ADVERTENCIA",MessageBoxButtons.YesNo,MessageBoxIcon.Warning) == DialogResult.Yes)
+                    if (MessageBox.Show($"Ya existe una configuración para {conf.Name} ({conf.Resolution}).\n\n¿Desea sobreescribir esta configuración?","ADVERTENCIA",MessageBoxButtons.YesNo,MessageBoxIcon.Warning) == DialogResult.Yes)
                     { 
                         conf.Path = _path;
                         conf.Resolution = _resolution;
-                        conf.Scale = int.Parse(_scale.TrimEnd('%'));
                         ConfigurationService.Update(conf.Id, conf);
                     }
 
@@ -69,7 +68,6 @@ namespace AutoRes.Forms
                         Name = _program,
                         Path = _path,
                         Resolution = _resolution,
-                        Scale = int.Parse(_scale.TrimEnd('%'))
                     });
                     ConfigurationService.Save(_configurations); 
                 }

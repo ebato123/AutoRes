@@ -37,14 +37,14 @@
             btnDelete = new Button();
             pnlMain = new Panel();
             dgvConfigs = new DataGridView();
-            dgvColSelect = new DataGridViewCheckBoxColumn();
-            dgvColProgram = new DataGridViewTextBoxColumn();
-            dgvColResolution = new DataGridViewComboBoxColumn();
-            dgvColScale = new DataGridViewComboBoxColumn();
-            dgvColID = new DataGridViewTextBoxColumn();
             notifyIcon = new NotifyIcon(components);
             cmsNotifyIcon = new ContextMenuStrip(components);
             tsmiCerrarAutoRes = new ToolStripMenuItem();
+            dgvColSelect = new DataGridViewCheckBoxColumn();
+            dgvColProgram = new DataGridViewTextBoxColumn();
+            dgvColResolution = new DataGridViewComboBoxColumn();
+            dgvColEnabled = new DataGridViewComboBoxColumn();
+            dgvColID = new DataGridViewTextBoxColumn();
             pnlFooter.SuspendLayout();
             pnlMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvConfigs).BeginInit();
@@ -56,7 +56,7 @@
             pnlTop.Dock = DockStyle.Top;
             pnlTop.Location = new Point(0, 0);
             pnlTop.Name = "pnlTop";
-            pnlTop.Size = new Size(578, 22);
+            pnlTop.Size = new Size(628, 22);
             pnlTop.TabIndex = 0;
             // 
             // pnlFooter
@@ -67,7 +67,7 @@
             pnlFooter.Dock = DockStyle.Bottom;
             pnlFooter.Location = new Point(0, 734);
             pnlFooter.Name = "pnlFooter";
-            pnlFooter.Size = new Size(578, 60);
+            pnlFooter.Size = new Size(628, 60);
             pnlFooter.TabIndex = 1;
             // 
             // btnSaveChanges
@@ -109,23 +109,45 @@
             pnlMain.Dock = DockStyle.Fill;
             pnlMain.Location = new Point(0, 22);
             pnlMain.Name = "pnlMain";
-            pnlMain.Size = new Size(578, 712);
+            pnlMain.Size = new Size(628, 712);
             pnlMain.TabIndex = 2;
             // 
             // dgvConfigs
             // 
             dgvConfigs.AllowUserToAddRows = false;
             dgvConfigs.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvConfigs.Columns.AddRange(new DataGridViewColumn[] { dgvColSelect, dgvColProgram, dgvColResolution, dgvColScale, dgvColID });
+            dgvConfigs.Columns.AddRange(new DataGridViewColumn[] { dgvColSelect, dgvColProgram, dgvColResolution, dgvColEnabled, dgvColID });
             dgvConfigs.Dock = DockStyle.Fill;
             dgvConfigs.Location = new Point(0, 0);
             dgvConfigs.Name = "dgvConfigs";
             dgvConfigs.RowHeadersVisible = false;
             dgvConfigs.RowHeadersWidth = 62;
-            dgvConfigs.Size = new Size(578, 712);
+            dgvConfigs.Size = new Size(628, 712);
             dgvConfigs.TabIndex = 0;
             dgvConfigs.ColumnHeaderMouseClick += dgvConfigs_ColumnHeaderMouseClick;
             dgvConfigs.CurrentCellDirtyStateChanged += dgvConfigs_CurrentCellDirtyStateChanged;
+            // 
+            // notifyIcon
+            // 
+            notifyIcon.ContextMenuStrip = cmsNotifyIcon;
+            notifyIcon.Icon = (Icon)resources.GetObject("notifyIcon.Icon");
+            notifyIcon.Text = "AutoRes";
+            notifyIcon.Visible = true;
+            notifyIcon.MouseDoubleClick += notifyIcon_MouseDoubleClick;
+            // 
+            // cmsNotifyIcon
+            // 
+            cmsNotifyIcon.ImageScalingSize = new Size(24, 24);
+            cmsNotifyIcon.Items.AddRange(new ToolStripItem[] { tsmiCerrarAutoRes });
+            cmsNotifyIcon.Name = "cmsNotifyIcon";
+            cmsNotifyIcon.Size = new Size(132, 36);
+            // 
+            // tsmiCerrarAutoRes
+            // 
+            tsmiCerrarAutoRes.Name = "tsmiCerrarAutoRes";
+            tsmiCerrarAutoRes.Size = new Size(131, 32);
+            tsmiCerrarAutoRes.Text = "Cerrar";
+            tsmiCerrarAutoRes.Click += tsmiCerrarAutoRes_Click;
             // 
             // dgvColSelect
             // 
@@ -150,25 +172,24 @@
             // 
             dgvColResolution.Frozen = true;
             dgvColResolution.HeaderText = "Resolución";
-            dgvColResolution.Items.AddRange(new object[] { "7680x4320", "5120x1440", "3840x2160", "3440x1440", "2560x1600", "2560x1440", "2560x1080", "1920x1200", "1920x1080", "1680x1050", "1600x900", "1440x900", "1366x768", "1360x768", "1280x800", "1280x720", "1024x768", "800x600" });
+            dgvColResolution.Items.AddRange(new object[] { "3840x2160", "3440x1440", "2560x1600", "2560x1440", "2560x1080", "1920x1200", "1920x1080", "1680x1050", "1600x900", "1440x900", "1366x768", "1360x768", "1280x800", "1280x720", "1024x768", "800x600" });
             dgvColResolution.MinimumWidth = 8;
             dgvColResolution.Name = "dgvColResolution";
             dgvColResolution.Resizable = DataGridViewTriState.False;
             dgvColResolution.Width = 150;
             // 
-            // dgvColScale
+            // dgvColEnabled
             // 
-            dgvColScale.Frozen = true;
-            dgvColScale.HeaderText = "Escala";
-            dgvColScale.Items.AddRange(new object[] { "100%", "125%", "150%", "175%", "200%", "225%", "250%", "275%", "300%", "325%", "350%", "375%", "400%", "425%", "450%", "475%", "500%" });
-            dgvColScale.MinimumWidth = 8;
-            dgvColScale.Name = "dgvColScale";
-            dgvColScale.Resizable = DataGridViewTriState.False;
-            dgvColScale.Width = 150;
+            dgvColEnabled.HeaderText = "Activo";
+            dgvColEnabled.Items.AddRange(new object[] { "Sí", "No" });
+            dgvColEnabled.MinimumWidth = 8;
+            dgvColEnabled.Name = "dgvColEnabled";
+            dgvColEnabled.Resizable = DataGridViewTriState.True;
+            dgvColEnabled.SortMode = DataGridViewColumnSortMode.Automatic;
+            dgvColEnabled.Width = 120;
             // 
             // dgvColID
             // 
-            dgvColID.Frozen = true;
             dgvColID.HeaderText = "ID";
             dgvColID.MinimumWidth = 8;
             dgvColID.Name = "dgvColID";
@@ -177,33 +198,11 @@
             dgvColID.Visible = false;
             dgvColID.Width = 150;
             // 
-            // notifyIcon
-            // 
-            notifyIcon.ContextMenuStrip = cmsNotifyIcon;
-            notifyIcon.Icon = (Icon)resources.GetObject("notifyIcon.Icon");
-            notifyIcon.Text = "AutoRes";
-            notifyIcon.Visible = true;
-            notifyIcon.MouseDoubleClick += notifyIcon_MouseDoubleClick;
-            // 
-            // cmsNotifyIcon
-            // 
-            cmsNotifyIcon.ImageScalingSize = new Size(24, 24);
-            cmsNotifyIcon.Items.AddRange(new ToolStripItem[] { tsmiCerrarAutoRes });
-            cmsNotifyIcon.Name = "cmsNotifyIcon";
-            cmsNotifyIcon.Size = new Size(241, 69);
-            // 
-            // tsmiCerrarAutoRes
-            // 
-            tsmiCerrarAutoRes.Name = "tsmiCerrarAutoRes";
-            tsmiCerrarAutoRes.Size = new Size(240, 32);
-            tsmiCerrarAutoRes.Text = "Cerrar";
-            tsmiCerrarAutoRes.Click += tsmiCerrarAutoRes_Click;
-            // 
             // AutoRes
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(578, 794);
+            ClientSize = new Size(628, 794);
             Controls.Add(pnlMain);
             Controls.Add(pnlFooter);
             Controls.Add(pnlTop);
@@ -215,6 +214,7 @@
             Text = "AutoRes";
             FormClosing += AutoRes_FormClosing;
             Load += AutoRes_Load;
+            Shown += AutoRes_Shown;
             pnlFooter.ResumeLayout(false);
             pnlMain.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvConfigs).EndInit();
@@ -230,14 +230,14 @@
         private DataGridView dgvConfigs;
         private Button btnAdd;
         private Button btnDelete;
-        private DataGridViewCheckBoxColumn dgvColSelect;
-        private DataGridViewTextBoxColumn dgvColProgram;
-        private DataGridViewComboBoxColumn dgvColResolution;
-        private DataGridViewComboBoxColumn dgvColScale;
-        private DataGridViewTextBoxColumn dgvColID;
         private Button btnSaveChanges;
         private NotifyIcon notifyIcon;
         private ContextMenuStrip cmsNotifyIcon;
         private ToolStripMenuItem tsmiCerrarAutoRes;
+        private DataGridViewCheckBoxColumn dgvColSelect;
+        private DataGridViewTextBoxColumn dgvColProgram;
+        private DataGridViewComboBoxColumn dgvColResolution;
+        private DataGridViewComboBoxColumn dgvColEnabled;
+        private DataGridViewTextBoxColumn dgvColID;
     }
 }

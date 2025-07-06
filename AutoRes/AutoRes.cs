@@ -1,4 +1,5 @@
 ﻿using AutoRes.Forms;
+using Microsoft.Win32;
 using System.Configuration;
 using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
@@ -8,10 +9,22 @@ namespace AutoRes
     public partial class AutoRes : Form
     {
         private bool exitingFromTray = false;
+        private ProcessWatcher _watcher;
+        private const string RegistryPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
+        private const string AppName = "AutoRes";
 
         public AutoRes()
         {
             InitializeComponent();
+            this.Opacity = 0; // Invisible
+
+            var configs = ConfigurationService.Load();
+
+            // Set AutoStart with Windows
+            EnsureStartupEnabled();
+
+            _watcher = new ProcessWatcher(configs);
+            _watcher.Start();
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
@@ -49,11 +62,13 @@ namespace AutoRes
                 var configurations = ConfigurationService.Load();
                 foreach (var config in configurations)
                 {
+                    string enabled = config.Enabled ? "Sí" : "No";
+
                     dgvConfigs.Rows.Add(
                         false,
                         config.Name,
                         config.Resolution,
-                        $"{config.Scale}%",
+                        enabled,
                         config.Id
                     );
                 }
@@ -171,10 +186,8 @@ namespace AutoRes
                 if (conf != null)
                 {
                     string dgvResolution = row.Cells["dgvColResolution"].Value?.ToString();
-                    string dgvScaleRaw = row.Cells["dgvColScale"].Value?.ToString();
-                    int dgvScale = int.TryParse(dgvScaleRaw?.TrimEnd('%'), out int parsedScale) ? parsedScale : conf.Scale;
 
-                    if (conf.Resolution != dgvResolution || conf.Scale != dgvScale)
+                    if (conf.Resolution != dgvResolution)
                     {
                         cambiosDetectados = true;
                         break;
@@ -204,8 +217,37 @@ namespace AutoRes
                 notifyIcon.Visible = true;
                 notifyIcon.ShowBalloonTip(1000, "AutoRes", "La aplicación sigue funcionando en segundo plano.", ToolTipIcon.Info);
             }
+            else
+            {
+                _watcher?.ApplyOriginalResolution();
+                _watcher?.Stop();
+                notifyIcon.Visible = false;
+                System.Windows.Forms.Application.Exit();
+            }
         }
 
+        public static void EnsureStartupEnabled()
+        {
+            try
+            {
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(RegistryPath, true))
+                {
+                    string appPath = System.Windows.Forms.Application.ExecutablePath;
+
+                    object existingValue = key.GetValue(AppName);
+
+                    if (existingValue == null || !string.Equals(existingValue.ToString(), $"\"{appPath}\"", StringComparison.OrdinalIgnoreCase))
+                    {
+                        key.SetValue(AppName, $"\"{appPath}\"");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"No se pudo registrar AutoRes en el inicio automático.\n\nError: {ex.Message}", "AutoRes", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+        }
         private void SaveChanges()
         {
             var configs = ConfigurationService.Load();
@@ -221,12 +263,13 @@ namespace AutoRes
                 {
                     conf.Resolution = row.Cells["dgvColResolution"].Value?.ToString();
 
-                    if (int.TryParse(row.Cells["dgvColScale"].Value?.ToString().TrimEnd('%'), out int scale))
-                        conf.Scale = scale;
+                    conf.Enabled = row.Cells["dgvColEnabled"].Value?.ToString() == "Sí" ? true : false;
 
                     ConfigurationService.Update(conf.Id, conf);
                 }
             }
+
+            ReiniciarServicio();
         }
 
         private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -240,7 +283,23 @@ namespace AutoRes
         {
             exitingFromTray = true;
             notifyIcon.Visible = false;
+            _watcher?.Stop();
             System.Windows.Forms.Application.Exit();
+        }
+
+        private void ReiniciarServicio()
+        {
+            _watcher.Stop();
+            _watcher = new ProcessWatcher(ConfigurationService.Load());
+            _watcher.Start();
+        }
+
+        private void AutoRes_Shown(object sender, EventArgs e)
+        {
+            this.Hide();
+            this.Opacity = 1.0;
+            notifyIcon.Visible = true;
+            notifyIcon.ShowBalloonTip(1000, "AutoRes", "AutoRes se está ejecutando en segundo plano.", ToolTipIcon.Info);
         }
     }
 }
